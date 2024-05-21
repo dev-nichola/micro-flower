@@ -124,7 +124,7 @@ func (r *ProductRepositoryImpl) Update(ctx context.Context, id uuid.UUID, produc
 }
 
 func (r *ProductRepositoryImpl) Delete(ctx context.Context, id uuid.UUID) error {
-	SQL := "DELETE FROM products where id = $1"
+	SQL := "DELETE FROM products WHERE id = $1"
 	_, err := r.db.ExecContext(ctx, SQL, id)
 
 	if err != nil {

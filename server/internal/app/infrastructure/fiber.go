@@ -10,7 +10,6 @@ import (
 )
 
 func Run() {
-
 	DB, err := NewDB()
 
 	if err != nil {
