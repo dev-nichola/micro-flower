@@ -30,6 +30,8 @@ func Run() {
 	app.Get("/products", productHandler.FindAll)
 	app.Get("/product/:productId", productHandler.FindByID)
 	app.Post("/product", productHandler.Create)
+	app.Put("/product/:productId", productHandler.Edit)
+	app.Delete("/product/:productId", productHandler.Destroy)
 
 	app.Listen("localhost:8080")
 }

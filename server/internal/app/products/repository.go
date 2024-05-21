@@ -12,7 +12,7 @@ type ProductRepository interface {
 	FindAll(ctx context.Context) (*[]Product, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*Product, error)
 	Save(ctx context.Context, product Product) (Product, error)
-	Update(ctx context.Context, id uuid.UUID, product Product) error
+	Update(ctx context.Context, id uuid.UUID, product Product) (Product, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
@@ -39,7 +39,7 @@ func (r *ProductRepositoryImpl) FindAll(ctx context.Context) (*[]Product, error)
 	for res.Next() {
 		product := &Product{}
 
-		// Scan semua query sqlnya harus secara berurutan sesuai query
+		// Scan semua query sqlnya dan harus secara berurutan sesuai querynya
 		err := res.Scan(
 			&product.ID,
 			&product.Name,
@@ -107,11 +107,29 @@ func (r *ProductRepositoryImpl) Save(ctx context.Context, product Product) (Prod
 	return product, nil
 }
 
-func (r *ProductRepositoryImpl) Update(ctx context.Context, id uuid.UUID, product Product) error {
-	SQL := "UPDATE product SET where id = $1"
-	r.db.ExecContext()
+func (r *ProductRepositoryImpl) Update(ctx context.Context, id uuid.UUID, product Product) (Product, error) {
+
+	updated_at := time.Now()
+	SQL := "UPDATE products SET name = $1, price = $2, updated_at = $3 where id = $4"
+	_, err := r.db.ExecContext(ctx, SQL, product.Name, product.Price, updated_at, id)
+
+	defer recover()
+
+	if err != nil {
+		panic(err)
+	}
+
+	product.ID = id
+	return product, nil
 }
 
 func (r *ProductRepositoryImpl) Delete(ctx context.Context, id uuid.UUID) error {
+	SQL := "DELETE FROM products where id = $1"
+	_, err := r.db.ExecContext(ctx, SQL, id)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

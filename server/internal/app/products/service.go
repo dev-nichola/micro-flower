@@ -10,7 +10,7 @@ type ProductService interface {
 	FindAll(ctx context.Context) (*[]Product, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*Product, error)
 	Save(ctx context.Context, product Product) (Product, error)
-	Update(ctx context.Context, id uuid.UUID, product Product) error
+	Update(ctx context.Context, id uuid.UUID, product Product) (Product, error)
 	Delete(ctx context.Context, id uuid.UUID) error
 }
 
@@ -56,10 +56,24 @@ func (service *ProductServiceImpl) Save(ctx context.Context, product Product) (P
 	return product, err
 }
 
-func (service *ProductServiceImpl) Update(ctx context.Context, id uuid.UUID, product Product) error {
-	return nil
+func (service *ProductServiceImpl) Update(ctx context.Context, id uuid.UUID, product Product) (Product, error) {
+	result, err := service.Repository.Update(ctx, id, product)
+
+	defer recover()
+
+	if err != nil {
+		panic(err)
+	}
+
+	return result, err
 }
 
 func (service *ProductServiceImpl) Delete(ctx context.Context, id uuid.UUID) error {
+	err := service.Repository.Delete(ctx, id)
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
